@@ -1,0 +1,28 @@
+{
+  "people": [
+    {
+      "name": "Alice Kumar",
+      "age": 28,
+      "gender": "Female",
+      "mobile": "9001112222"
+    },
+    {
+      "name": "Bob Singh",
+      "age": 34,
+      "gender": "Male",
+      "mobile": "9003334444"
+    },
+    {
+      "name": "Charlie Rao",
+      "age": 19,
+      "gender": "Other",
+      "mobile": "9005556666"
+    },
+    {
+      "name": "Diana Patel",
+      "age": 42,
+      "gender": "Female",
+      "mobile": "9007778888"
+    }
+  ]
+}
