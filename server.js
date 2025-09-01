@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import connectDB, { connectionInfo } from "./db/db.js";
 import mongoose from "mongoose";
@@ -14,6 +15,7 @@ connectDB().then(()=>{
 });
 
 const app = express();
+app.use(cors({ origin: '*'}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
