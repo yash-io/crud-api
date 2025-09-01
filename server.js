@@ -5,9 +5,9 @@ import personRouter from "./router/crud.routes.js";
 
 dotenv.config();
 
-// Ensure DB connected (cached in connectDB)
+// Kick off an initial (non-blocking) connection attempt
 connectDB().catch(err => {
-  console.error("Failed initial DB connection", err);
+  console.error("Initial DB connection attempt failed (will retry on demand)", err.message);
 });
 
 const app = express();
@@ -15,10 +15,25 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/person", personRouter);
+// Middleware to ensure DB connected before hitting /person routes
+const ensureDb = async (_req, _res, next) => {
+  try {
+    await connectDB();
+    return next();
+  } catch (e) {
+    return next(e);
+  }
+};
+
+app.use("/person", ensureDb, personRouter);
 
 app.get("/", (_req, res) => {
-  res.json({ status: "ok", endpoints: ["GET /person", "POST /person", "GET /person/:id", "PUT /person/:id", "DELETE /person/:id"] });
+  res.json({ status: "ok", endpoints: ["GET /person", "POST /person", "GET /person/:id", "PUT /person/:id", "DELETE /person/:id"], env: process.env.NODE_ENV || 'development' });
+});
+
+app.get('/health', async (_req, res) => {
+  const mongoState = (await import('mongoose')).default.connection.readyState; // 0=disconnected 1=connected 2=connecting 3=disconnecting
+  res.json({ status: 'ok', mongoState });
 });
 
 // Basic error handler
