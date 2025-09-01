@@ -1,28 +1,31 @@
-// api/index.js
 import express from "express";
 import dotenv from "dotenv";
-import connectDB from "../db/db.js";
-import personRouter from "../router/crud.routes.js";
-import serverless from "serverless-http";
+import connectDB from "./db/db.js";
+import personRouter from "./router/crud.routes.js";
 
 dotenv.config();
+
+// Ensure DB connected (cached in connectDB)
+connectDB().catch(err => {
+  console.error("Failed initial DB connection", err);
+});
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// router to handle all requests
 app.use("/person", personRouter);
 
-connectDB();
-
-// Root test route
-app.get("/", (_, res) => {
-  res.send(
-    '<h1>Person API</h1><p>Use <a href="/person">/person</a> to view people.</p>'
-  );
+app.get("/", (_req, res) => {
+  res.json({ status: "ok", endpoints: ["GET /person", "POST /person", "GET /person/:id", "PUT /person/:id", "DELETE /person/:id"] });
 });
 
-// export handler instead
-export const handler = serverless(app);
+// Basic error handler
+app.use((err, _req, res, _next) => {
+  console.error("Unhandled error", err);
+  res.status(500).json({ error: "Internal Server Error" });
+});
+
+// Export the Express app (functions as a handler for Vercel)
+export default app;
